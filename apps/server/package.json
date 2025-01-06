@@ -13,7 +13,7 @@
   "type": "commonjs",
   "description": "",
   "devDependencies": {
-    "tsc-watch": "^6.2.1",
+    "tsc-watch": "^6.2.1", 
     "typescript": "^5.7.2"
   },
   "dependencies": {
