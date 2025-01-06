@@ -14,11 +14,13 @@
 	"dependencies": {
 		"@hookform/resolvers": "^3.9.0",
 		"@prisma/client": "^5.19.0",
-		"@radix-ui/react-dropdown-menu": "^2.1.1",  
+		"@radix-ui/react-dropdown-menu": "^2.1.1",
 		"@radix-ui/react-icons": "^1.3.0",
 		"@radix-ui/react-slot": "^1.1.0",
+		"@repo/db": "*",
 		"@tabler/icons-react": "^3.19.0",
 		"@types/bcrypt": "^5.0.2",
+		"@types/socket.io": "^3.0.1",
 		"bcrypt": "^5.1.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
@@ -34,12 +36,14 @@
 		"react-hook-form": "^7.53.0",
 		"react-icons": "^5.3.0",
 		"recoil": "^0.7.7",
+		"socket.io": "^4.8.1",
+		"socket.io-client": "^4.8.1",
 		"tailwind-merge": "^2.5.2",
 		"tailwindcss-animate": "^1.0.7",
-		"zod": "^3.23.8",
-		"@repo/db": "*"
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
+		"@repo/db": "*",
 		"@types/node": "^20",
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
@@ -48,8 +52,7 @@
 		"postcss": "^8",
 		"prisma": "^5.19.0",
 		"tailwindcss": "^3.4.1",
-		"typescript": "^5",
-		"@repo/db": "*"
+		"typescript": "^5"
 	},
 	"author": "YashPatel7",
 	"license": "ISC"
