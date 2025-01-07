@@ -1,10 +1,7 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSession } from 'next-auth/react';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { handleSearch } from '@/action/handleSearch';
@@ -49,56 +46,7 @@ export default function Page() {
 						</CardContent>
 					</Card>
 
-					<div className='border bg-white/[0.2px] backdrop-blur-sm rounded-xl p-4'>
-						<h2 className='text-xl font-semibold mb-4'>Find Users</h2>
-						<div className='space-y-4'>
-							<Input
-								type='text'
-								placeholder='Search users...'
-								onChange={(e) => {
-									setNumber(e.target.value);
-								}}
-							/>
-							<div className='space-y-2'>
-								{users ?
-									users.length > 0 ?
-										<>
-											{users.map((user: UserType, index: any) => (
-												<motion.div
-                                                    onClick={()=>{
-                                                        router.push(`/chat/${user.id}`)
-                                                    }}
-													key={index}
-													initial={{ opacity: 0, y: 20 }}
-													animate={{ opacity: 1, y: 0 }}
-													transition={{ duration: 0.3, delay: index * 0.1 }}
-													className='flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800'
-												>
-													<div className='relative'>
-														<Avatar>
-															<AvatarFallback>
-																{user.Name.charAt(0)}
-															</AvatarFallback>
-														</Avatar>
-														<Badge
-															variant='outline'
-															className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2`}
-														/>
-													</div>
-													<div>
-														<h3 className='font-medium'>{user.Name}</h3>
-														<p className='text-sm text-gray-500'>
-															{user.MobileNumber}
-														</p>
-													</div>
-												</motion.div>
-											))}
-										</>
-									:	<div></div>
-								:	<></>}
-							</div>
-						</div>
-					</div>
+					
 				</div>
 			</div>
 		</div>

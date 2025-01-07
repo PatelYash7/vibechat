@@ -1,6 +1,14 @@
 'use client';
 
+import { handleSearch } from '@/action/handleSearch';
+import { Input } from '@/components/ui/input';
+import { useDebounce } from '@/lib/hooks/useDebounce';
+import { UserType } from '@/types/types';
+import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Message {
 	text: string;
@@ -100,11 +108,73 @@ export default function Page({ params }: { params: { id: string } }) {
 
 		setInputMessage('');
 	};
+	const { data } = useSession();
+	const [number, setNumber] = useState('');
+	const debouncedNumber = useDebounce({ value: number, delay: 400 });
+	const [users, setUsers] = useState<UserType[]>();
+	useEffect(() => {
+		const handleCall = async () => {
+			const result = await handleSearch({ number: debouncedNumber });
+			setUsers(result);
+		};
+		if (debouncedNumber) {
+			handleCall();
+		} else {
+			setUsers(undefined);
+		}
+	}, [debouncedNumber]);
 	return (
 		<div className='pt-10 px-4'>
 			<div className='flex justify-between border rounded-xl'>
 				<div className='p-4 border-r w-1/2'>
 					<h1 className='text-2xl font-bold'>Chats</h1>
+					<div className='space-y-4'>
+						<div className='py-4'>
+							<Input
+								type='text'
+								placeholder='Search users...'
+								onChange={(e) => {
+									setNumber(e.target.value);
+								}}
+							/>
+						</div>
+						<div className='space-y-2'>
+							{users ?
+								users.length > 0 ?
+									<>
+										{users.map((user: UserType, index: any) => (
+											<motion.div
+												onClick={() => {}}
+												key={index}
+												initial={{ opacity: 0, y: 20 }}
+												animate={{ opacity: 1, y: 0 }}
+												transition={{ duration: 0.3, delay: index * 0.1 }}
+												className='flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800'
+											>
+												<div className='relative'>
+													<Avatar>
+														<AvatarFallback>
+															{user.Name.charAt(0)}
+														</AvatarFallback>
+													</Avatar>
+													<Badge
+														variant='outline'
+														className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2`}
+													/>
+												</div>
+												<div>
+													<h3 className='font-medium'>{user.Name}</h3>
+													<p className='text-sm text-gray-500'>
+														{user.MobileNumber}
+													</p>
+												</div>
+											</motion.div>
+										))}
+									</>
+								:	<div></div>
+							:	<></>}
+						</div>
+					</div>
 				</div>
 				<div className='flex flex-col h-[90vh] w-1/2 p-4'>
 					<div className='mb-4'>
