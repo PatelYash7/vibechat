@@ -22,9 +22,9 @@ export default function Component() {
 		mode: 'onChange',
 		resolver: zodResolver(UserSchemaSignin),
 	});
-	const isDisabled = (errors.MobileNumber || errors.Password) ||true ;
 	const onSubmit = async (e: UserSchemaSigninType) => {
 		const res = await signIn('credentials', {
+			type:'signin',
 			number: e.MobileNumber,
 			password: e.Password,
 			redirect: false,

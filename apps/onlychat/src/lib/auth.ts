@@ -1,9 +1,8 @@
-
 import { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import prisma from '@/db';
+import { CheckSignIn, CheckSignUp } from '@/zod/authentication';
 
 export const authOptions: NextAuthOptions = {
 	providers: [
@@ -17,44 +16,62 @@ export const authOptions: NextAuthOptions = {
 			},
 			async authorize(credentials: any): Promise<any> {
 				try {
-					// Check if User exsist in database.
-					const CheckUser = await prisma.user.findFirst({
-						where: {
-							MobileNumber: credentials.number,
-						},
-					});
-					// If no User then Create a Entry in DB.
-					if (!CheckUser) {
-						const hashedpassword = await bcrypt.hash(credentials.password, 10);
-						const User = await prisma.user.create({
-							data: {
-								Name: credentials.name,
-								Password: hashedpassword,
-								MobileNumber: credentials.number,
-							},
-						});
-						return {
-							id: User.id,
-							name: User.Name,
-							number: User.MobileNumber,
-						};
+					if (credentials.type === 'signin') {
+						const isSignIN = CheckSignIn.parse(credentials);
+						// Check if User exsist in database.
+						try {
+							const CheckUser = await prisma.user.findFirst({
+								where: {
+									MobileNumber: isSignIN.number,
+								},
+							});
+							// To validate the password for the Login.
+
+							const validatedPassword = await bcrypt.compare(
+								isSignIN.password,
+								CheckUser?.Password as string,
+							);
+
+							// If validatedPassword then return the CheckUser.
+							if (validatedPassword) {
+								return {
+									id: CheckUser?.id,
+									name: CheckUser?.Name,
+									number: CheckUser?.MobileNumber,
+								};
+							} else {
+								throw new Error('Invalid credentials');
+							}
+						} catch (error) {
+							throw new Error('Cannot Find User');
+						}
 					}
-					// To validate the password for the Login.
-					const validatedPassword = await bcrypt.compare(
-						credentials.password,
-						CheckUser.Password as string,
-					);
-					// If validatedPassword then return the CheckUser.
-					if (validatedPassword) {
-						return {
-							id: CheckUser.id,
-							name: CheckUser.Name,
-							number: CheckUser.MobileNumber,
-						};
+
+					// If no User then Create a Entry in DB.
+					if (credentials.type === 'signup') {
+						const isSignUP = CheckSignUp.parse(credentials);
+						const hashedpassword = await bcrypt.hash(isSignUP.password, 10);
+						try {
+							const newUser = await prisma.user.create({
+								data: {
+									Name: isSignUP.name,
+									Password: hashedpassword,
+									MobileNumber: isSignUP.number,
+								},
+							});
+							return {
+								id: newUser.id,
+								name: newUser.Name,
+								number: newUser.MobileNumber,
+							};
+						} catch (error) {
+							throw new Error('Error Creating User');
+						}
 					}
 					return false;
 				} catch (e) {
-					return false;
+					console.error('Authorization error:', e);
+					return null;
 				}
 			},
 		}),
@@ -68,30 +85,26 @@ export const authOptions: NextAuthOptions = {
 		newUser: '/signup',
 	},
 	callbacks: {
-		async jwt({ token, user, profile, account }) {
+		async jwt({ token, user }) {
 			// if credential signin then we already have a user and you can create an token.
 			if (user) {
-				token.id = user.id;
 				token.name = user.name;
 				token.number = user.number;
 			}
 			return token;
 		},
-		async session({ token, session, user }) {
+		async session({ token, session }) {
 			if (token) {
-				session.user.id = token.id;
 				session.user.name = token.name;
 				session.user.number = token.number;
 			}
 			return session;
 		},
-		async signIn({ account, profile, token }: any) {
-			return true;
-		},
 	},
 	jwt: {
 		maxAge: 30 * 24 * 60 * 60,
 	},
+
 	session: {
 		strategy: 'jwt',
 		maxAge: 30 * 24 * 60 * 60,

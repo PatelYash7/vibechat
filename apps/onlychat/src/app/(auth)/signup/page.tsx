@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Eye, Mail, User, Phone } from 'lucide-react';
 import Link from 'next/link';
-import { FcGoogle } from 'react-icons/fc';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -19,6 +18,7 @@ export default function SignUpPage() {
 	const [error, setError] = useState('');
 	const onSubmit = async (e: UserSchemaSignupType) => {
 		const res = await signIn('credentials', {
+			type:'signup',
 			name: e.Name,
 			number: e.MobileNumber,
 			password: e.Password,
