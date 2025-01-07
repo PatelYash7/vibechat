@@ -9,16 +9,10 @@ export async function middleware(req: any) {
 	if (!token) {
 		return NextResponse.redirect(new URL('/api/auth/signin', req.url));
 	}
-
-	if (req.nextUrl.pathname.startsWith('/admin')) {
-		if (token.role !== 'Admin') {
-			return NextResponse.redirect(new URL('/', req.url));
-		}
-	}
 	return NextResponse.next();
 }
 
 export const config = {
 	// Add your protected routes in matcher.
-	matcher: [],
+	matcher: ['/dashboards'],
 };

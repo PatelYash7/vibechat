@@ -30,10 +30,10 @@ export default function Component() {
 			redirect: false,
 		});
 		if (res?.ok) {
-			router.push('/');
+			router.push('/dashboard');
 			window.location.replace('/');
 		} else {
-			setError('Invalid Number or password. Please try again.');
+			setError('Authentication Failed. Please try again.');
 		}
 	};
 	return (
@@ -99,7 +99,7 @@ export default function Component() {
 									id='password'
 									placeholder='*********'
 									type={visible ? 'text' : 'password'}
-									className='bg-[#222] text-2xl border-gray-700 text-white pr-10'
+									className='bg-[#222] border-gray-700 text-white pr-10'
 								/>
 								<Eye
 									onClick={() => {
@@ -136,11 +136,6 @@ export default function Component() {
 							Sign in
 						</Button>
 					</form>
-					{/* <div className='text-center'>
-						<Link href='#' className='text-sm text-blue-500 hover:underline'>
-							Forgot Your Password?
-						</Link>
-					</div> */}
 				</CardContent>
 			</Card>
 		</div>
