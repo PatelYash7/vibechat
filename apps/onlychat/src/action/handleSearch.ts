@@ -7,18 +7,20 @@ import { getServerSession } from 'next-auth';
 export const handleSearch = async ({ number }: { number: string }) => {
 	const session =await getServerSession(authOptions);
 	try {
-		const result = prisma.user.findMany({
+		const result = await prisma.user.findMany({
 			where: {
-				OR: [
-					{ MobileNumber: { startsWith: number } },
-					{ MobileNumber: { endsWith: number } },
-                    
-					{ MobileNumber: { contains: number } },
-
+				AND: [
+					{
+						OR: [
+							{ MobileNumber: { startsWith: number } },
+							{ MobileNumber: { endsWith: number } },
+							{ MobileNumber: { contains: number } },
+						],
+					},
+					{
+						NOT: { MobileNumber: session?.user.number }, // Exclude the current user
+					},
 				],
-				NOT:[{
-					id:session?.user.id
-				}]
 			},
 		});
         return result
@@ -26,3 +28,16 @@ export const handleSearch = async ({ number }: { number: string }) => {
         return undefined
     }
 };
+
+export const getUser =async ({number}:{number:string})=>{
+	try{
+		const result = await prisma.user.findFirst({
+			where:{
+				MobileNumber:number
+			}
+		}) 
+		return result;
+	}catch(error){
+		return null
+	}
+}

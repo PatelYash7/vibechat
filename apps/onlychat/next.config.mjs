@@ -4,6 +4,7 @@ const nextConfig = {
 	images: {
 		unoptimized: true,
 	},
+	reactStrictMode:false,
 	// Header for all the Inbuilt API Routes.
 	async headers() {
 		return [
