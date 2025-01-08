@@ -5,7 +5,7 @@ import { Socket } from 'socket.io-client';
 // URL for the Socket.IO server
 const SOCKET_URL = 'http://localhost:8080'; // Adjust this for your deployment
 
-export function useSocket(): Socket | null {
+export function useSocket(userNumber?:string): Socket | null {
 	const [socket, setSocket] = useState<Socket | null>(null);
 
 	useEffect(() => {
@@ -14,9 +14,11 @@ export function useSocket(): Socket | null {
 
 		newSocket.on('connect', () => {
 			console.log('Connected to server:', newSocket.id);
+			newSocket.emit("identify",userNumber);
+
 		});
 
-		newSocket.on('welcome', (data: any) => {
+		newSocket.on('privateMessage', (data: any) => {
 			console.log(data.message);
 		});
 
@@ -28,7 +30,7 @@ export function useSocket(): Socket | null {
 		return () => {
 			newSocket.close();
 		};
-	}, []);
+	}, [userNumber]);
 
 	return socket;
 }
