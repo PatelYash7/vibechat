@@ -20,16 +20,11 @@ export function useSocket(
 				newSocket.emit('identify', userNumber);
 			});
 
-			newSocket.on('privateMessage', (data: any) => {
-				console.log(data.message);
-			});
-
-			newSocket.on('disconnect', () => {
-				console.log('Disconnected from server');
-			});
-
 			// Cleanup on component unmount
 			return () => {
+				newSocket.on('disconnect', () => {
+					console.log('Disconnected from server');
+				});
 				newSocket.close();
 			};
 		

@@ -18,7 +18,7 @@ async function startServer() {
 
     const userSockets = new Map();
     const chatRooms = new Map();
-
+  
     io.on("connection", (socket) => {
       socket.on("identify", (userNumber) => {
         userSockets.set(userNumber, socket.id);
@@ -26,7 +26,7 @@ async function startServer() {
       });
 
       socket.on("joinChat", ({ sender, reciever }) => {
-        const roomId = generateRoomId(sender, reciever);
+        const roomId = generateRoomId(userSockets.get(sender),userSockets.get(reciever) ); 
         socket.join(roomId);
         chatRooms.set(roomId, { sender, reciever });
         console.log(`Created/Joined chat room: ${roomId}`);
@@ -34,14 +34,14 @@ async function startServer() {
         io.to(roomId).emit("chatReady", { roomId });
       });
 
-      socket.on("sendMessage", ({ roomId, message, senderNumber, senderName }) => {
+      socket.on("sendMessage", ({ roomId, message, senderNumber, senderName,isCurrentChat }) => {
         if (chatRooms.has(roomId)) {
           const room = chatRooms.get(roomId);
           const receiverNumber = room.sender === senderNumber ? room.reciever : room.sender;
           const receiverSocketId = userSockets.get(receiverNumber);
-
+          const senderSocketId = userSockets.get(senderNumber);
           // Emit message to both sender and receiver with full user info
-          io.to(roomId).emit("newMessage", {
+          io.to(receiverSocketId).emit("newMessage", {
             message,
             senderNumber,
             senderName,
@@ -49,8 +49,10 @@ async function startServer() {
             roomId
           });
 
+
           // Send notification if receiver is not in the room
           if (receiverSocketId) {
+            console.log("Message Sending")
             io.to(receiverSocketId).emit("messageNotification", {
               senderName,
               senderNumber,
@@ -61,7 +63,6 @@ async function startServer() {
           }
 
           // Emit recent chat update to both users
-          const senderSocketId = userSockets.get(senderNumber);
           if (senderSocketId) {
             io.to(senderSocketId).emit("updateRecentChat", {
               userNumber: receiverNumber,
@@ -79,6 +80,7 @@ async function startServer() {
             });
           }
 
+          
           console.log(`Message sent in room ${roomId}: ${message}`);
         } else {
           console.log(`Attempted to send message to non-existent room: ${roomId}`);

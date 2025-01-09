@@ -14,5 +14,5 @@ export async function middleware(req: any) {
 
 export const config = {
 	// Add your protected routes in matcher.
-	matcher: ['/dashboards'],
+	matcher: ['/dashboards','/chat/:path*'],
 };
