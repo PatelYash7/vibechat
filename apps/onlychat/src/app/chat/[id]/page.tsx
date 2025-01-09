@@ -31,7 +31,6 @@ interface currentChat {
 }
 export default function Page({ params }: { params: { id: string } }) {
 	const { data } = useSession();
-	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputMessage, setInputMessage] = useState('');
 	const [number, setNumber] = useState('');
 	const debouncedNumber = useDebounce({ value: number, delay: 400 });
@@ -56,7 +55,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [messages]);
+	}, [currentChat.Message]);
 
 	const addToRecentChats = (
 		user: UserType,
@@ -165,6 +164,7 @@ export default function Page({ params }: { params: { id: string } }) {
 				socket.on(
 					'newMessage',
 					async ({ message, senderNumber, senderName, timestamp, roomId }) => {
+                        console.log("In New Message")
 						if (currentChat?.user.MobileNumber === senderNumber) {
 							console.log('first');
 							setCurrentChat((prev) => {
@@ -179,10 +179,6 @@ export default function Page({ params }: { params: { id: string } }) {
 									],
 								};
 							});
-							setMessages((prev) => [
-								...prev,
-								{ sender: 'other', content: message },
-							]);
 						}
 					},
 				);
@@ -190,7 +186,8 @@ export default function Page({ params }: { params: { id: string } }) {
 				socket.on(
 					'messageNotification',
 					async ({ senderName, senderNumber, message, timestamp, roomId }) => {
-						if (currentChat?.user.MobileNumber != senderNumber) {
+                        if (currentChat?.user.MobileNumber != senderNumber) {
+                            console.log("messageNotification")
 							const senderUser = await getUser({ number: senderNumber });
 							if (senderUser) {
 								addToRecentChats(senderUser, message, roomId, true);
@@ -226,7 +223,7 @@ export default function Page({ params }: { params: { id: string } }) {
 				socket.off('updateRecentChat');
 			};
 		}
-	}, [socket,currentChat, data?.user.number]);
+	}, [socket,currentChat.roomId, data?.user.number]);
 	return (
 		<div className='pt-10 px-4'>
 			<div className='flex justify-between border rounded-xl'>
