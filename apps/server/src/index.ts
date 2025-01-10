@@ -25,12 +25,12 @@ async function startServer() {
         console.log(`User ${userNumber} identified with socket ${socket.id}`);
       });
 
+
       socket.on("joinChat", ({ sender, reciever }) => {
-        const roomId = generateRoomId(userSockets.get(sender),userSockets.get(reciever) ); 
+        const roomId = generateRoomId(sender,reciever ); 
         socket.join(roomId);
         chatRooms.set(roomId, { sender, reciever });
         console.log(`Created/Joined chat room: ${roomId}`);
-        
         io.to(roomId).emit("chatReady", { roomId });
       });
 
@@ -87,12 +87,11 @@ async function startServer() {
         }
       });
 
-      socket.on("leaveChat", ({ roomId }) => {
+      socket.on("leaveChat", ({ roomId,user }) => {
         socket.leave(roomId);
-        chatRooms.delete(roomId);
-        console.log(`Left chat room: ${roomId}`);
+        // chatRooms.delete(roomId);
+        console.log(`${user} Left chat room: ${roomId}`);
       });
-
       socket.on("disconnect", () => {
         console.log(`Client disconnected: ${socket.id}`);
         for (let [userNumber, socketId] of userSockets.entries()) {

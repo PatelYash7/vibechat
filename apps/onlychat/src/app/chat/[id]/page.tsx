@@ -86,33 +86,42 @@ export default function Page({ params }: { params: { id: string } }) {
 		roomId,
 	}: {
 		user: UserType;
-		roomId?: string;
+		roomId: string;
 	}) => {
-		if (socket && data?.user.number)
+		if (
+			socket &&
+			data?.user.number &&
+			user.MobileNumber != currentChat.user.MobileNumber
+		)
 			socket.emit('joinChat', {
 				sender: data.user.number,
 				reciever: user.MobileNumber,
 			});
-		if (roomId) {
-			setCurrentChat((prev: any) => {
-				return {
-					Message: [],
-					roomId: roomId,
-					user: prev?.user ? prev.user : user,
-				};
-			});
+		if (
+			currentChat.user.MobileNumber == user.MobileNumber &&
+			roomId == currentChat.roomId
+		) {
+			console.log('Same Chat');
+			return;
+		} else {
+			console.log("roomId")
+				setCurrentChat((prev) => {
+					return {
+						Message: [],
+						roomId: roomId,
+						user: user,
+					};
+				});
+			
 		}
-		setCurrentChat((prev: any) => {
-			return {
-				Message: [],
-				roomId: '',
-				user: user,
-			};
-		});
 	};
-	console.log(currentChat);
 	const sendMessage = () => {
-		if (socket && inputMessage.trim() && currentChat.roomId && currentChat.user) {
+		if (
+			socket &&
+			inputMessage.trim() &&
+			currentChat.roomId &&
+			currentChat.user
+		) {
 			const message = inputMessage.trim();
 			socket.emit('sendMessage', {
 				roomId: currentChat.roomId,
@@ -120,18 +129,18 @@ export default function Page({ params }: { params: { id: string } }) {
 				senderNumber: data?.user.number,
 				senderName: data?.user.name,
 			});
-			setCurrentChat((prev)=>{
-                return {
-                    ...prev,
-                    Message:[
-                        ...prev.Message,
-                        {
-                            content:message,
-                            sender:'self'
-                        }
-                    ]
-                }
-            })
+			setCurrentChat((prev) => {
+				return {
+					...prev,
+					Message: [
+						...prev.Message,
+						{
+							content: message,
+							sender: 'self',
+						},
+					],
+				};
+			});
 			addToRecentChats(currentChat.user, message, currentChat.roomId);
 			setInputMessage('');
 		}
@@ -148,10 +157,9 @@ export default function Page({ params }: { params: { id: string } }) {
 		}
 	}, [debouncedNumber]);
 	useEffect(() => {
-		if (socket) {
+		if (socket && data?.user.number) {
 			const setupSocketListeners = () => {
 				socket.on('chatReady', ({ roomId }) => {
-					// @ts-ignore
 					setCurrentChat((prev) => {
 						return {
 							Message: [],
@@ -164,7 +172,7 @@ export default function Page({ params }: { params: { id: string } }) {
 				socket.on(
 					'newMessage',
 					async ({ message, senderNumber, senderName, timestamp, roomId }) => {
-                        console.log("In New Message")
+						console.log('In New Message');
 						if (currentChat?.user.MobileNumber === senderNumber) {
 							console.log('first');
 							setCurrentChat((prev) => {
@@ -186,8 +194,8 @@ export default function Page({ params }: { params: { id: string } }) {
 				socket.on(
 					'messageNotification',
 					async ({ senderName, senderNumber, message, timestamp, roomId }) => {
-                        if (currentChat?.user.MobileNumber != senderNumber) {
-                            console.log("messageNotification")
+						if (currentChat?.user.MobileNumber != senderNumber) {
+							console.log('messageNotification');
 							const senderUser = await getUser({ number: senderNumber });
 							if (senderUser) {
 								addToRecentChats(senderUser, message, roomId, true);
@@ -204,7 +212,8 @@ export default function Page({ params }: { params: { id: string } }) {
 					async ({ userNumber, message, timestamp, roomId }) => {
 						const chatUser = await getUser({ number: userNumber });
 						if (chatUser) {
-							const isCurrentChat = currentChat.user?.MobileNumber === userNumber;
+							const isCurrentChat =
+								currentChat.user?.MobileNumber === userNumber;
 							addToRecentChats(chatUser, message, roomId, !isCurrentChat);
 						}
 					},
@@ -215,7 +224,10 @@ export default function Page({ params }: { params: { id: string } }) {
 
 			return () => {
 				if (currentChat.roomId) {
-					socket.emit('leaveChat', { roomId: currentChat.roomId });
+					socket.emit('leaveChat', {
+						roomId: currentChat.roomId,
+						user: data.user.number,
+					});
 				}
 				socket.off('chatReady');
 				socket.off('newMessage');
@@ -223,7 +235,7 @@ export default function Page({ params }: { params: { id: string } }) {
 				socket.off('updateRecentChat');
 			};
 		}
-	}, [socket,currentChat.roomId, data?.user.number]);
+	}, [socket, currentChat.roomId, data?.user.number]);
 	return (
 		<div className='pt-10 px-4'>
 			<div className='flex justify-between border rounded-xl'>
@@ -246,7 +258,7 @@ export default function Page({ params }: { params: { id: string } }) {
 											onClick={() => {
 												setUsers(undefined);
 												setNumber('');
-												handleCurrentChat({ user: user });
+												handleCurrentChat({ user: user, roomId: '' });
 												// handleUserSelect(user);
 											}}
 											key={user.MobileNumber}
@@ -287,19 +299,10 @@ export default function Page({ params }: { params: { id: string } }) {
 											animate={{ opacity: 1, y: 0 }}
 											exit={{ opacity: 0, y: -20 }}
 											onClick={() => {
-												// @ts-ignore
-												setCurrentChat((prev) => {
-													return {
-														user: chat.user,
-														Message: prev?.Message,
-														roomId: chat.roomId,
-													};
-												});
 												handleCurrentChat({
 													user: chat.user,
 													roomId: chat.roomId,
 												});
-												// handleUserSelect(chat.user, messages, chat.roomId);
 											}}
 											className={`flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer ${
 												chat.unread ? 'bg-blue-50 dark:bg-blue-900/20' : ''
@@ -385,7 +388,7 @@ export default function Page({ params }: { params: { id: string } }) {
 							onChange={(e) => setInputMessage(e.target.value)}
 							className='flex-1'
 							placeholder='Type your message...'
-							disabled={!currentChat.user.id|| !currentChat.roomId}
+							disabled={!currentChat.user.id || !currentChat.roomId}
 						/>
 						<button
 							type='submit'
@@ -397,7 +400,7 @@ export default function Page({ params }: { params: { id: string } }) {
 					</form>
 				</div>
 			</div>
-			{currentChat?.roomId && <Toaster position='top-right' />}
+			{!currentChat?.roomId && <Toaster position='top-right' />}
 		</div>
 	);
 }

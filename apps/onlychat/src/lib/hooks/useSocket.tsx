@@ -6,13 +6,12 @@ import { Socket } from 'socket.io-client';
 // URL for the Socket.IO server
 const SOCKET_URL = 'http://localhost:8080'; // Adjust this for your deployment
 
-export function useSocket(
-	userNumber?: string,
-): Socket | null {
+export function useSocket(userNumber?: string): Socket | null {
 	const [socket, setSocket] = useState<Socket | null>(null);
 
 	useEffect(() => {
-			const newSocket = io(SOCKET_URL, { autoConnect: true});
+		if (userNumber) {
+			const newSocket = io(SOCKET_URL, { autoConnect: true });
 			setSocket(newSocket);
 
 			newSocket.on('connect', () => {
@@ -27,7 +26,7 @@ export function useSocket(
 				});
 				newSocket.close();
 			};
-		
+		}
 	}, [userNumber]);
 
 	return socket;
