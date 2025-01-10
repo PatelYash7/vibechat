@@ -24,8 +24,6 @@ async function startServer() {
         userSockets.set(userNumber, socket.id);
         console.log(`User ${userNumber} identified with socket ${socket.id}`);
       });
-
-
       socket.on("joinChat", ({ sender, reciever }) => {
         const roomId = generateRoomId(sender,reciever ); 
         socket.join(roomId);
@@ -34,6 +32,7 @@ async function startServer() {
         io.to(roomId).emit("chatReady", { roomId });
       });
 
+      
       socket.on("sendMessage", ({ roomId, message, senderNumber, senderName,isCurrentChat }) => {
         if (chatRooms.has(roomId)) {
           const room = chatRooms.get(roomId);
@@ -89,7 +88,8 @@ async function startServer() {
 
       socket.on("leaveChat", ({ roomId,user }) => {
         socket.leave(roomId);
-        // chatRooms.delete(roomId);
+        chatRooms.set(roomId,{reciever:''});
+        console.log(chatRooms)
         console.log(`${user} Left chat room: ${roomId}`);
       });
       socket.on("disconnect", () => {

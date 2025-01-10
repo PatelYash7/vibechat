@@ -28,6 +28,8 @@ export function useSocket(userNumber?: string): Socket | null {
 			};
 		}
 	}, [userNumber]);
-
-	return socket;
+	if(userNumber){
+		return socket;
+	}
+	return null
 }

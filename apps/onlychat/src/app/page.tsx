@@ -1,4 +1,3 @@
-import { Clipboard } from '@/components/clipboard';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { FloatingNav } from '@/components/ui/floating-navbar';
 import { IconHome } from '@tabler/icons-react';
@@ -18,7 +17,6 @@ export default async function Home() {
 					Effortless NextJS Starter Kit for Developers
 				</div>
 				<div className='py-4'>
-					<Clipboard />
 				</div>
 				<p className=' sm:text-xl md:text-xl px-12 sm:px-24 py-8 font-semibold dark:text-gray-400 text-gray-400  text-center'>
 					This template is designed for modern developers who want to focus on
