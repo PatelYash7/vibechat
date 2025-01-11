@@ -1,7 +1,6 @@
 export class SocketStore {
     private userSockets: Map<string, string>;
     private chatRooms: Map<string, { sender: string; reciever: string }>;
-  
     constructor() {
       this.userSockets = new Map();
       this.chatRooms = new Map();

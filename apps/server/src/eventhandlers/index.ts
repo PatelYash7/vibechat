@@ -5,8 +5,7 @@ import { handleJoinChat } from "../eventhandlers/joinchat";
 import { handleSendMessage } from "../eventhandlers/message-handler";
 import { handleLeaveChat } from "../eventhandlers/leavechat";
 import { handleDisconnect } from "../eventhandlers/disconnect";
-
-export function registerEventHandlers(
+export async function registerEventHandlers(
   io: Server,
   socket: Socket,
   store: SocketStore
