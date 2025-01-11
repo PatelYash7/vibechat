@@ -52,7 +52,6 @@ export const ChatWindow = ({
     addToRecentChats(currentChat.user, message, currentChat.roomId);
     setInputMessage('');
   };
-  console.log(currentChat)
   return (
     <div className='flex flex-col h-[90vh] w-1/2 p-4'>
       {/* Chat Header */}

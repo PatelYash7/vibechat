@@ -13,7 +13,7 @@ import { RecentChats } from './RecentChats';
 export default function ChatPage() {
 	const { data } = useSession();
 	const [number, setNumber] = useState('');
-	const { currentChat, setCurrentChat, recentChats, addToRecentChats } =
+	const { currentChat, setCurrentChat, recentChats, addToRecentChats,setRecentChats } =
 		useChatState();
 
 	const socket = useSocketSetup({
@@ -77,6 +77,7 @@ export default function ChatPage() {
 						handleCurrentChat={handleCurrentChat}
 					/>
 					<RecentChats
+						setRecentChat={setRecentChats}
 						recentChats={recentChats}
 						handleCurrentChat={handleCurrentChat}
 					/>
