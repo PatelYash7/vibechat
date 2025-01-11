@@ -29,15 +29,29 @@ export const useSocketSetup = ({
 					roomId: roomId,
 					user: prev?.user,
 				}));
+				
 			});
-
 			socket.on('newMessage', ({ message, senderNumber }) => {
 				if (currentChat?.user.MobileNumber === senderNumber) {
-					setCurrentChat((prev: any) => ({
+					setCurrentChat((prev) => ({
 						...prev,
 						Message: [...prev.Message, { sender: 'other', content: message }],
 					}));
 				}
+			});
+			if (currentChat.roomId) {
+				socket.emit('sendOldMessage', {
+					roomId: currentChat.roomId,
+					sender: userNumber,
+				});
+			}
+			
+			socket.on('oldMessage', (oldMessage) => {
+				console.log(oldMessage)
+				setCurrentChat((prev)=>({
+					...prev,
+					Message:[...oldMessage]
+				}))
 			});
 
 			socket.on(
@@ -54,7 +68,6 @@ export const useSocketSetup = ({
 					}
 				},
 			);
-
 			return () => {
 				if (currentChat.roomId) {
 					socket.emit('leaveChat', {
@@ -62,6 +75,7 @@ export const useSocketSetup = ({
 						user: userNumber,
 					});
 				}
+				socket.off('oldMessage')
 				socket.off('chatReady');
 				socket.off('newMessage');
 				socket.off('messageNotification');

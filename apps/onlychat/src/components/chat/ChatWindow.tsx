@@ -45,7 +45,7 @@ export const ChatWindow = ({
       ...prev,
       Message: [
         ...prev.Message,
-        { content: message, sender: 'self' },
+        { content: message, sender: userNumber },
       ],
     }));
 
@@ -66,6 +66,7 @@ export const ChatWindow = ({
       </div>
 
       <MessageList
+      userNumber={userNumber}
         messages={currentChat.Message}
         messagesEndRef={messagesEndRef}
       />

@@ -39,22 +39,24 @@ export default function ChatPage() {
 				sender: data.user.number,
 				reciever: user.MobileNumber,
 			});
+			socket.emit('sendOldMessage',{
+				roomId:currentChat.roomId,
+				sender:currentChat.user.MobileNumber
+			});
 		}
 		if (
 			socket &&
 			currentChat.user.MobileNumber == user.MobileNumber &&
 			roomId == currentChat.roomId
 		) {
-			socket.emit('joinChat', {
-				sender: data?.user.number,
-				reciever: user.MobileNumber,
+			socket.emit('sendOldMessage',{
+				roomId:currentChat.roomId,
+				sender:currentChat.user.MobileNumber
 			});
-			return;
 		} else {
-			console.log('roomId');
 			setCurrentChat((prev) => {
 				return {
-					Message: [],
+					Message: [...prev.Message],
 					roomId: roomId,
 					user: user,
 				};
