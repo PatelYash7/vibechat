@@ -24,8 +24,8 @@ export const useSocketSetup = ({
 	useEffect(() => {
 		if (socket && userNumber) {
 			socket.on('chatReady', ({ roomId }) => {
-				setCurrentChat((prev: any) => ({
-					Message: [],
+				setCurrentChat((prev) => ({
+					Message: prev.Message,
 					roomId: roomId,
 					user: prev?.user,
 				}));

@@ -9,6 +9,7 @@ interface MessageListProps {
 }
 
 export const MessageList = ({ messages,userNumber, messagesEndRef }: MessageListProps) => {
+  console.log(messages)
   return (
     <div className='flex-1 overflow-y-auto mb-4 border rounded p-4'>
       {messages.map((msg, index) => (

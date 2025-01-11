@@ -40,7 +40,7 @@ export const ChatWindow = ({
       senderNumber: userNumber,
       senderName: userName,
     });
-
+         
     setCurrentChat((prev:any) => ({
       ...prev,
       Message: [
@@ -52,7 +52,7 @@ export const ChatWindow = ({
     addToRecentChats(currentChat.user, message, currentChat.roomId);
     setInputMessage('');
   };
-
+  console.log(currentChat)
   return (
     <div className='flex flex-col h-[90vh] w-1/2 p-4'>
       {/* Chat Header */}
@@ -66,7 +66,7 @@ export const ChatWindow = ({
       </div>
 
       <MessageList
-      userNumber={userNumber}
+        userNumber={userNumber}
         messages={currentChat.Message}
         messagesEndRef={messagesEndRef}
       />
